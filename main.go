@@ -1,14 +1,22 @@
 package main
 
 import (
+	"log"
 	"net/http"
 	"os"
+	"strings"
 )
 
 func main() {
-	rootpath := os.Getenv("SERVERPATH")
+	port := os.Getenv("WEBPORT")
+	if port == "" {
+		port = ":8000"
+	}
+	if !strings.HasPrefix(port, ":") {
+		port = ":" + port
+	}
 
-	if err := http.ListenAndServe(":80", http.FileServer(http.Dir(rootpath))); err != nil {
-		panic(err)
+	if err := http.ListenAndServe(port, http.FileServer(http.Dir("files"))); err != nil {
+		log.Fatal(err)
 	}
 }
