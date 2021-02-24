@@ -1,11 +1,16 @@
 package main
 
 import (
+	"embed"
+	"io/fs"
 	"log"
 	"net/http"
 	"os"
 	"strings"
 )
+
+//go:embed files
+var efs embed.FS
 
 func main() {
 	port := os.Getenv("WEBPORT")
@@ -16,7 +21,8 @@ func main() {
 		port = ":" + port
 	}
 
-	if err := http.ListenAndServe(port, http.FileServer(http.Dir("files"))); err != nil {
+	subfs, _ := fs.Sub(efs, "files")
+	if err := http.ListenAndServe(port, http.FileServer(http.FS(subfs))); err != nil {
 		log.Fatal(err)
 	}
 }
